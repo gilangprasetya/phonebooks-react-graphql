@@ -80,3 +80,19 @@ module.exports = { schema, solution }
 //       avatar
 //     }
 //   }
+  
+//   mutation updateContact($id: ID!, $name:String!, $phone: String!) {
+//     updateContact(id: $id, input: {name: $name, phone: $phone}) {
+//       _id
+//       name
+//       phone
+//     }
+//   }
+  
+//   mutation deleteContact($id: ID!) {
+//     deleteContact(id: $id) {
+//       _id
+//       name
+//       phone
+//     }
+//   }
