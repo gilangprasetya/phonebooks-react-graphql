@@ -1,0 +1,55 @@
+const { buildSchema } = require("graphql")
+const phonebook = require("../models/Phonebook")
+
+const schema = buildSchema(`
+input ContactInput{
+    name: String
+    phone: String
+}
+
+input AvatarInput{
+    avatar: String
+}
+
+type Contact {
+    _id: ID!
+    name: String
+    phone: String
+    avatar: String
+}
+
+type Query {
+    getContacts(page: Int): [Contact]
+    getContact(id: ID!): Contact
+}
+
+type Mutation {
+    createContact(input: ContactInput): Contact
+    updateContact(id: ID!, input: ContactInput): Contact
+    updateAvatar(id: ID!, input: AvatarInput): Contact
+    deleteContact(id: ID!): Contact
+}
+`)
+
+// class Contact {
+//     constructor(_id, { name, phone }) {
+//         this._id = _id
+//         this.name = name
+//         this.phone = phone
+//     }
+// }
+
+const solution = {
+    getContacts: ({ page = 1 }) => {
+        const limit = 13
+        const offset = (page - 1) * limit
+        return phonebook.find({}).sort({ name: "asc" }).limit(limit).skip(offset)
+    },
+    getContact: ({ id }) => phonebook.findById(id),
+    createContact: ({ input }) => phonebook.create(input),
+    updateContact: ({ id, input }) => phonebook.findByIdAndUpdate(id, input, { new: true }),
+    updateAvatar: ({ id, input }) => phonebook.findByIdAndUpdate(id, input, { new: true }),
+    deleteContact: ({ id }) => phonebook.findByIdAndRemove(id)
+}
+
+module.exports = { schema, solution }

@@ -3,7 +3,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var { graphqlHTTP } = require('express-graphql')
-const { schema, solution } = require('./graphql/todoSchema')
+const { schema, solution } = require('./graphql/phonebookSchema')
 
 const mongoose = require('mongoose');
 
@@ -11,7 +11,7 @@ main().catch(err => console.log(err));
 
 async function main() {
     try {
-        await mongoose.connect('mongodb://127.0.0.1:27017/tododb');
+        await mongoose.connect('mongodb://127.0.0.1:27017/phonebookdb');
         console.log("Connected to MongoDB");
     } catch (error) {
         console.error("MongoDB connection error:", error);
