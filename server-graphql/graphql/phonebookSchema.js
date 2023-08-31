@@ -53,3 +53,30 @@ const solution = {
 }
 
 module.exports = { schema, solution }
+
+// query getAllContacts {
+//     getContacts {
+//       _id
+//       name
+//       phone
+//       avatar
+//     }
+//   }
+  
+//   query getContactsByPage($page: Int) {
+//     getContacts(page: $page) {
+//       _id
+//       name
+//       phone
+//       avatar
+//     }
+//   }
+  
+//   mutation createContact($name: String!, $phone: String!) {
+//     createContact(input: {name: $name, phone: $phone}) {
+//       _id
+//       name
+//       phone
+//       avatar
+//     }
+//   }
