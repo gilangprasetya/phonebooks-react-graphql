@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import PhoneHeader from "./PhoneHeader";
 import PhoneList from "./PhoneList";
 import axios from "axios";
+import { GET_CONTACTS, CREATE_CONTACT } from "../graphql/gql";
+import { useLazyQuery, useMutation } from "@apollo/client";
 
 export default function PhoneBox() {
     const [data, setData] = useState([]);
@@ -11,49 +13,69 @@ export default function PhoneBox() {
     const isLoadingRef = useRef(false);
     const [searchKeyword, setSearchKeyword] = useState("");
 
-    const fetchData = async (page, sortOrder, keyword = "") => {
-        try {
-            const response = await axios.get("http://localhost:3001/api/phonebooks", {
-                params: { sort: sortOrder, page, keyword },
+    const [fetchData, { loading, data: fetchedData }] = useLazyQuery(GET_CONTACTS, {
+        fetchPolicy: "network-only",
+        variables: { sort: sortOrder, page: currentPage, keyword: searchKeyword },
+        onCompleted: (result) => {
+            const newContacts = result.contacts;
+
+            setData((prevData) => {
+                if (currentPage === 1) return newContacts;
+                return [
+                    ...prevData,
+                    ...newContacts.filter((contact) => {
+                        return !prevData.some((existingContact) => existingContact.id === contact.id);
+                    }),
+                ];
             });
-            if (response.data.phonebooks) {
-                // Check if it's the first page (page === 1)
-                // If yes, set the data directly from the response
-                // If not, append the new data only if it's not already present in the state
-                setData((prevData) => {
-                    if (page === 1) return response.data.phonebooks;
-                    return [
-                        ...prevData,
-                        ...response.data.phonebooks.filter((contact) => {
-                            return !prevData.some((existingContact) => existingContact.id === contact.id);
-                        }),
-                    ];
-                });
-                totalPagesRef.current = response.data.pages;
-                isLoadingRef.current = false;
-            }
-        } catch (error) {
+            totalPagesRef.current = result.pages;
+            isLoadingRef.current = false;
+        },
+        onError: (error) => {
             console.error("Error fetching data:", error);
-        }
-    };
+        },
+    });
+
+    const [addContact] = useMutation(CREATE_CONTACT, {
+        onCompleted: (result) => {
+            const newContact = result.createContact;
+
+            setData((prevData) => [...prevData, newContact]);
+        },
+        onError: (error) => {
+            console.error("Error creating contact:", error);
+        },
+        update: (cache, { data: { createContact } }) => {
+            // Update your cache manually if necessary
+        },
+    });
 
     useEffect(() => {
-        fetchData(currentPage, sortOrder, searchKeyword);
-    }, [currentPage, sortOrder, searchKeyword]);
+        if (fetchedData) {
+            const newContacts = fetchedData.contacts;
+
+            setData((prevData) => {
+                if (currentPage === 1) return newContacts;
+                return [
+                    ...prevData,
+                    ...newContacts.filter((contact) => {
+                        return !prevData.some((existingContact) => existingContact.id === contact.id);
+                    }),
+                ];
+            });
+            totalPagesRef.current = fetchedData.pages;
+            isLoadingRef.current = false;
+        }
+    }, [fetchedData, currentPage]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const handleAddContact = async (name, phone) => {
         try {
-            // Send a POST request to the server to create the new contact
-            const response = await axios.post("http://localhost:3001/api/phonebooks", {
-                name: name,
-                phone: phone,
-            });
-
-            // Get the newly created contact data from the server response
-            const newContact = response.data;
-
-            // Update the data state with the new contact
-            setData((prevData) => [...prevData, newContact]);
+            // Send a mutation to create the new contact
+            await addContact({ variables: { name, phone } });
         } catch (error) {
             console.error("Error creating contact:", error);
         }

@@ -41,7 +41,7 @@ type Mutation {
 
 const solution = {
     getContacts: ({ page = 1 }) => {
-        const limit = 13
+        const limit = 100
         const offset = (page - 1) * limit
         return phonebook.find({}).sort({ name: "asc" }).limit(limit).skip(offset)
     },
