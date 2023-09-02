@@ -43,7 +43,7 @@ const solution = {
     getContacts: ({ page = 1 }) => {
         const limit = 100
         const offset = (page - 1) * limit
-        return phonebook.find({}).sort({ name: "asc" }).limit(limit).skip(offset)
+        return phonebook.find({}).limit(limit).skip(offset)
     },
     getContact: ({ id }) => phonebook.findById(id),
     createContact: ({ input }) => phonebook.create(input),
