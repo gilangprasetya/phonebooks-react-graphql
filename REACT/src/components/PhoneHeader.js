@@ -6,7 +6,7 @@ export default function PhoneHeader({ handleAddContact, sortOrder, setSortOrder,
     const [showPopup, setShowPopup] = useState(false);
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
-    const [searchKeyword, setSearchKeyword] = useState(""); // New state variable for search keyword
+    const [searchKeyword, setSearchKeyword] = useState(""); 
 
     const handleAddButtonClick = () => {
         setShowPopup(true);
@@ -33,8 +33,7 @@ export default function PhoneHeader({ handleAddContact, sortOrder, setSortOrder,
     };
 
     const handleSearchChange = (keyword) => {
-        setSearchKeyword(keyword); // Update the searchKeyword state
-        // Pass the search keyword back to the parent component (Phonebooks)
+        setSearchKeyword(keyword);
         handleSearch(keyword);
     };
 

@@ -1,24 +1,23 @@
 import { gql } from "@apollo/client";
 
-export const GET_CONTACTS = gql`
- query GetContacts {
-     getContacts {
-       _id
-       name
-       phone
-       avatar
-     }
-   }
+export const GET_PHONEBOOKS = gql`
+    query getPhonebooks($sort: String, $page: Int, $keyword: String) {
+        getPhonebooks(sort: $sort, page: $page, keyword: $keyword) {
+            _id
+            name
+            phone
+            avatar
+        }
+    }
 `;
 
-export const CREATE_CONTACT = gql`
-mutation CreateContact($name: String!, $phone: String!) {
-    createContact(input: { name: $name, phone: $phone }) {
+export const CREATE_PHONEBOOK = gql`
+mutation CreatePhonebook($name: String!, $phone: String!) {
+    createPhonebook(input: { name: $name, phone: $phone }) {
         _id
         name
         phone
         avatar
+        }
     }
-}
 `;
-
