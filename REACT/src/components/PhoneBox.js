@@ -11,7 +11,7 @@ export default function PhoneBox() {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchKeyword, setSearchKeyword] = useState('');
 
-    const { loading, error, data: queryData } = useQuery(GET_PHONEBOOKS, {
+    const { data: queryData } = useQuery(GET_PHONEBOOKS, {
         variables: { sort: sortOrder, page: currentPage, keyword: searchKeyword },
     });
 
@@ -36,8 +36,6 @@ export default function PhoneBox() {
         setSearchKeyword(keyword)
         setCurrentPage(1)
     };
-    
-    if (error) return `Error! ${error.message}`;
 
     return (
         <div className="container">
