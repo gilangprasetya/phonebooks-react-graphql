@@ -38,7 +38,7 @@ type Mutation {
 `)
 
 const solution = {
-    getPhonebooks: ({ page = 1, limit = 13, sortby = "name", sort = "asc", keyword = ""  }) => {
+    getPhonebooks: ({ page = 1, limit = 13, sortby = "name", sort = "asc", keyword = "" }) => {
         const skip = (page - 1) * limit
         let query = phonebook.find({})
         if (sortby && sort) {
@@ -50,7 +50,7 @@ const solution = {
         if (keyword) {
             query = query.find({ name: { $regex: keyword, $options: 'i' } });
         }
-      
+
         const results = query.exec();
         return results;
     },
