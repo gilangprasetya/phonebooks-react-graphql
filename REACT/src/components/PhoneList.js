@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { DELETE_PHONEBOOK, UPDATE_AVATAR, UPDATE_PHONEBOOK } from '../graphql/gql';
 import axios from 'axios';
 
 export default function PhoneList({ id, name, phone, avatar, data, setData }) {
@@ -7,20 +9,34 @@ export default function PhoneList({ id, name, phone, avatar, data, setData }) {
     const [editedPhone, setEditedPhone] = useState(phone);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-    const updateAvatar = (contactId, newAvatar) => {
-        // Make a copy of the data array to modify it
-        const updatedData = data.map((contact) => {
-            if (contact.id === contactId) {
-                return {
-                    ...contact,
-                    avatar: newAvatar,
-                };
-            }
-            return contact;
-        });
+    const [updateAvatarMutation] = useMutation(UPDATE_AVATAR);
+    const [updatePhonebookMutation] = useMutation(UPDATE_PHONEBOOK);
+    const [deletePhonebookMutation] = useMutation(DELETE_PHONEBOOK);
 
-        // Update the data state with the new avatar
-        setData(updatedData);
+    const updateAvatar = async (contactId, newAvatar) => {
+        try {
+            const response = await updateAvatarMutation({
+                variables: {
+                    contactId,
+                    newAvatar,
+                },
+            });
+
+            if (response && response.data) {
+                const updatedData = data.map((contact) => {
+                    if (contact.id === contactId) {
+                        return {
+                            ...contact,
+                            avatar: newAvatar,
+                        };
+                    }
+                    return contact;
+                });
+                setData(updatedData);
+            }
+        } catch (error) {
+            console.error("Error updating avatar:", error);
+        }
     };
 
     const handleImageClick = () => {
@@ -35,12 +51,10 @@ export default function PhoneList({ id, name, phone, avatar, data, setData }) {
             axios
                 .put(`http://localhost:3001/api/phonebooks/${id}/avatar`, formData)
                 .then((response) => {
-                    // Call the function to update the editedAvatar state and the data array
                     updateAvatar(id, response.data.data.avatar);
                 })
                 .catch((error) => {
                     console.error("Error updating avatar:", error);
-                    // Handle the error, show an error message, or implement proper error handling
                 });
             window.location.reload()
         });
@@ -52,22 +66,20 @@ export default function PhoneList({ id, name, phone, avatar, data, setData }) {
     };
 
     const handleSaveClick = async (event) => {
-        event.preventDefault(); // Prevent the default form submission behavior
+        event.preventDefault();
 
         try {
-            // Perform API call to update the contact data
-            await axios.put(`http://localhost:3001/api/phonebooks/${id}`, {
-                name: editedName,
-                phone: editedPhone,
+            await updatePhonebookMutation({
+                variables: {
+                    id,
+                    name: editedName,
+                    phone: editedPhone,
+                },
             });
 
-            // Update the local state with the edited values and exit edit mode
-            setEditedName(editedName);
-            setEditedPhone(editedPhone);
             setIsEditing(false);
         } catch (error) {
             console.error('Error updating contact:', error);
-            // Handle the error, show an error message, or implement proper error handling
         }
     };
 
@@ -75,18 +87,18 @@ export default function PhoneList({ id, name, phone, avatar, data, setData }) {
         setShowConfirmModal(true);
     };
 
-    const handleConfirmDelete = () => {
-        axios
-            .delete(`http://localhost:3001/api/phonebooks/${id}`)
-            .then((response) => {
-                // Handle successful delete, you may update the state here if required
-                // console.log(`Contact with id ${id} deleted successfully.`);
-                window.location.reload(); // Refresh the page after successful delete
-            })
-            .catch((error) => {
-                // Handle error if delete fails
-                console.error("Error deleting contact:", error);
+    const handleConfirmDelete = async () => {
+        try {
+            await deletePhonebookMutation({
+                variables: {
+                    id,
+                },
             });
+
+            window.location.reload();
+        } catch (error) {
+            console.error("Error deleting contact:", error);
+        }
     };
 
     const handleCancelDelete = () => {
@@ -107,7 +119,6 @@ export default function PhoneList({ id, name, phone, avatar, data, setData }) {
             </div>
             <div className="info">
                 {isEditing ? (
-                    // Show input fields during edit mode
                     <form onSubmit={handleSaveClick}>
                         <input
                             type="text"
@@ -123,7 +134,6 @@ export default function PhoneList({ id, name, phone, avatar, data, setData }) {
                         <br />
                     </form>
                 ) : (
-                    // Show contact details in non-edit mode
                     <>
                         <span className="name">{editedName}</span>
                         <br />

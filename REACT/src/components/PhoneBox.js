@@ -36,6 +36,7 @@ export default function PhoneBox() {
         setSearchKeyword(keyword)
         setCurrentPage(1)
     };
+    
     if (error) return `Error! ${error.message}`;
 
     return (
