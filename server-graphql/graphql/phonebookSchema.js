@@ -49,21 +49,18 @@ const solution = {
     getPhonebooks: ({ page = 1, limit = 13, sortby = "name", sort = "asc", keyword = ""  }) => {
         const skip = (page - 1) * limit
         let query = phonebook.find({})
-        // Apply sorting
         if (sortby && sort) {
             query = query.sort({ [sortby]: sort });
-          }
-      
-          // Apply pagination
-          query = query.skip(skip).limit(limit);
-      
-          // Apply keyword search
-          if (keyword) {
+        }
+
+        query = query.skip(skip).limit(limit);
+
+        if (keyword) {
             query = query.find({ name: { $regex: keyword, $options: 'i' } });
-          }
+        }
       
-          const results = query.exec();
-          return results;
+        const results = query.exec();
+        return results;
     },
     getPhonebook: ({ id }) => phonebook.findById(id),
     createPhonebook: ({ input }) => phonebook.create(input),
