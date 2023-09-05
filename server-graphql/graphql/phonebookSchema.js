@@ -38,7 +38,7 @@ type Mutation {
 `)
 
 const solution = {
-    getPhonebooks: ({ page = 1, limit = 13, sortby = "name", sort = "asc", keyword = "" }) => {
+    getPhonebooks: ({ page, limit, sortby = "name", sort, keyword = "" }) => {
         const skip = (page - 1) * limit
         let query = phonebook.find({})
         if (sortby && sort) {

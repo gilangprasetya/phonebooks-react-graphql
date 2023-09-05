@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpZA, faArrowDownZA } from "@fortawesome/free-solid-svg-icons";
 
-export default function PhoneHeader({ handleAddContact, sortOrder, setSortOrder, handleSearch }) {
+export default function PhoneHeader({ handleAddContact, sortOrder, handleSortClick, handleSearch }) {
     const [showPopup, setShowPopup] = useState(false);
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
-    const [searchKeyword, setSearchKeyword] = useState(""); 
+    const [searchKeyword, setSearchKeyword] = useState("");
 
     const handleAddButtonClick = () => {
         setShowPopup(true);
@@ -25,11 +25,6 @@ export default function PhoneHeader({ handleAddContact, sortOrder, setSortOrder,
         setShowPopup(false);
         setName("");
         setPhone("");
-    };
-
-    const handleSortClick = () => {
-        const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-        setSortOrder(newSortOrder);
     };
 
     const handleSearchChange = (keyword) => {

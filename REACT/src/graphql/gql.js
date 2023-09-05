@@ -1,14 +1,14 @@
 import { gql } from "@apollo/client";
 
 export const GET_PHONEBOOKS = gql`
-    query getPhonebooks($sort: String, $page: Int, $keyword: String) {
-        getPhonebooks(sort: $sort, page: $page, keyword: $keyword) {
-            _id
-            name
-            phone
-            avatar
-        }
+query getPhonebooks($sort: String, $sortby: String, $page: Int, $limit: Int, $keyword: String) {
+    getPhonebooks(sort: $sort, sortby: $sortby, page: $page, limit: $limit, keyword: $keyword) {
+      _id
+      name
+      phone
+      avatar
     }
+  }  
 `;
 
 export const CREATE_PHONEBOOK = gql`
