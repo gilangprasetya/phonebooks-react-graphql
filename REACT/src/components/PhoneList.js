@@ -1,65 +1,15 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { DELETE_PHONEBOOK, UPDATE_AVATAR, UPDATE_PHONEBOOK } from '../graphql/gql';
-import axios from 'axios';
 
-export default function PhoneList({ id, name, phone, avatar, data, setData }) {
+export default function PhoneList({ id, name, phone, avatar }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editedName, setEditedName] = useState(name);
     const [editedPhone, setEditedPhone] = useState(phone);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-    const [updateAvatarMutation] = useMutation(UPDATE_AVATAR);
     const [updatePhonebookMutation] = useMutation(UPDATE_PHONEBOOK);
     const [deletePhonebookMutation] = useMutation(DELETE_PHONEBOOK);
-
-    const updateAvatar = async (contactId, newAvatar) => {
-        try {
-            const response = await updateAvatarMutation({
-                variables: {
-                    contactId,
-                    newAvatar,
-                },
-            });
-
-            if (response && response.data) {
-                const updatedData = data.map((contact) => {
-                    if (contact.id === contactId) {
-                        return {
-                            ...contact,
-                            avatar: newAvatar,
-                        };
-                    }
-                    return contact;
-                });
-                setData(updatedData);
-            }
-        } catch (error) {
-            console.error("Error updating avatar:", error);
-        }
-    };
-
-    const handleImageClick = () => {
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = "image/*";
-        fileInput.addEventListener("change", (event) => {
-            const file = event.target.files[0];
-            const formData = new FormData();
-            formData.append("avatar", file);
-
-            axios
-                .put(`http://localhost:3001/api/phonebooks/${id}/avatar`, formData)
-                .then((response) => {
-                    updateAvatar(id, response.data.data.avatar);
-                })
-                .catch((error) => {
-                    console.error("Error updating avatar:", error);
-                });
-            window.location.reload()
-        });
-        fileInput.click();
-    };
 
     const handleEditClick = () => {
         setIsEditing(true);
@@ -114,7 +64,7 @@ export default function PhoneList({ id, name, phone, avatar, data, setData }) {
                     width="90px"
                     height="90px"
                     alt="User"
-                    onClick={handleImageClick}
+                    // onClick={handleImageClick}
                 />
             </div>
             <div className="info">

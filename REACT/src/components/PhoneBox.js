@@ -101,8 +101,6 @@ export default function PhoneBox() {
                             name={contact.name}
                             phone={contact.phone}
                             avatar={contact.avatar}
-                            data={data}
-                            setData={setData}
                         />
                     ))}
                 </ul>
