@@ -20,7 +20,10 @@ export default function PhoneBox() {
 
     useEffect(() => {
         if (queryData && queryData.getPhonebooks) {
-            setData((prevData) => [...prevData, ...queryData.getPhonebooks]);
+            setData((prevData) => [...prevData, ...queryData.getPhonebooks.filter((contact) => {
+                return !prevData.some((existingContact) => existingContact._id === contact._id);
+            }),
+            ]);
             setLoading(false);
         }
     }, [queryData]);
@@ -74,6 +77,9 @@ export default function PhoneBox() {
     const handleSortClick = () => {
         const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
         setSortOrder(newSortOrder);
+        setCurrentPage(1)
+        setData([])
+        refetch({ sort: newSortOrder })
     };
 
     return (
@@ -88,9 +94,9 @@ export default function PhoneBox() {
             </header>
             <main className="mt-3">
                 <ul>
-                    {data.map((contact, index) => (
+                    {data.map((contact) => (
                         <PhoneList
-                            key={index}
+                            key={contact._id}
                             id={contact._id}
                             name={contact.name}
                             phone={contact.phone}
