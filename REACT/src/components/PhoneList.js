@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { DELETE_PHONEBOOK, UPDATE_AVATAR, UPDATE_PHONEBOOK } from '../graphql/gql';
+import { DELETE_PHONEBOOK, GET_PHONEBOOKS, UPDATE_AVATAR, UPDATE_PHONEBOOK } from '../graphql/gql';
+import axios from 'axios'
 
 export default function PhoneList({ id, name, phone, avatar }) {
     const [isEditing, setIsEditing] = useState(false);
@@ -10,6 +11,9 @@ export default function PhoneList({ id, name, phone, avatar }) {
 
     const [updatePhonebookMutation] = useMutation(UPDATE_PHONEBOOK);
     const [deletePhonebookMutation] = useMutation(DELETE_PHONEBOOK);
+    const [updateAvatarMutation] = useMutation(UPDATE_AVATAR, {
+        refetchQueries: [{ query: GET_PHONEBOOKS }]
+    })
 
     const handleEditClick = () => {
         setIsEditing(true);
@@ -55,6 +59,30 @@ export default function PhoneList({ id, name, phone, avatar }) {
         setShowConfirmModal(false);
     };
 
+    const handleAvatarChange = async (event) => {
+        const picture = event.target.files[0];
+        const formData = new FormData();
+        formData.append("avatar", picture);
+
+        try {
+            const response = await axios.post(
+                `http://localhost:3001/upload-avatar`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            await updateAvatarMutation({
+                variables: { id, avatar: response.data },
+            });
+            window.location.reload();
+        } catch (error) {
+            console.error("Upload error", error);
+        }
+    };
+
     return (
         <li className="card">
             <div className="image">
@@ -63,8 +91,17 @@ export default function PhoneList({ id, name, phone, avatar }) {
                     className="img-fluid"
                     width="90px"
                     height="90px"
-                    alt="User"
-                    // onClick={handleImageClick}
+                    alt="Avatar"
+                    onClick={() =>
+                        document.getElementById(`selectAvatar${id}`).click()
+                    }
+                />
+                <input
+                    id={"selectAvatar" + id}
+                    hidden
+                    type="file"
+                    name="avatar"
+                    onChange={handleAvatarChange}
                 />
             </div>
             <div className="info">
